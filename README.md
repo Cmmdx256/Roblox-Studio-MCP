@@ -187,7 +187,7 @@ Yapay zeka modelleri kod çalıştırırken yaygın Roblox API hatalarına takı
 ### 2. Depoyu Klonlama ve Derleme
 ```bash
 git clone <repo-url>
-cd Stdiomcp
+cd "Roblox Studio MCP"
 npm install
 npm run build
 ```
@@ -208,38 +208,74 @@ Eklentiyi iki yöntemden biriyle yükleyebilirsiniz:
 
 ---
 
-## 🤖 AI İstemci Yapılandırmaları (Claude Desktop / Cursor)
+## 🤖 AI İstemci Yapılandırmaları (Tüm Bilgisayarlar İçin Evrensel Kurulum)
 
-### Claude Desktop (`claude_desktop_config.json`)
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+Herhangi bir bilgisayarda sabit ve taşınabilir şekilde çalıştırmak için **3 farklı evrensel yöntem** sunulmaktadır:
+
+---
+
+### 🌟 Yöntem 1: Global CLI Kaydı (Önerilen — Tüm Bilgisayarlarda Tek Satır!)
+
+Proje klasöründe bir defa `npm link` çalıştırarak sistemi global komut olarak kaydedin:
+```bash
+npm run build
+npm link
+```
+
+Artık **Claude Desktop**, **Cursor** veya herhangi bir MCP istemcisinde hiçbir dosya yolu yazmanıza gerek kalmaz:
+
+#### Claude Desktop (`claude_desktop_config.json`)
+* **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+* **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 ```json
 {
   "mcpServers": {
     "roblox-universal-studio": {
-      "command": "C:\\Program Files\\nodejs\\node.exe",
-      "args": [
-        "C:\\Users\\Theso\\Desktop\\roblox_sc\\Stdiomcp\\dist\\index.js"
-      ]
+      "command": "roblox-studio-mcp"
     }
   }
 }
 ```
 
-### Cursor / VS Code (`.cursor/mcp.json`)
+---
+
+### 🚀 Yöntem 2: Cursor / VS Code Evrensel Çalışma Alanı (`${workspaceFolder}`)
+
+Projeyi Cursor veya VS Code içinde açtığınızda `.cursor/mcp.json` veya `.vscode/mcp.json` dosyasına ekleyin. Hangi bilgisayarda açılırsa açılsın `${workspaceFolder}` otomatik olarak algılanır:
+
 ```json
 {
   "mcpServers": {
     "roblox-universal-studio": {
       "command": "node",
       "args": [
-        "C:/Users/Theso/Desktop/roblox_sc/Stdiomcp/dist/index.js"
+        "${workspaceFolder}/dist/index.js"
       ]
     }
   }
 }
 ```
+
+---
+
+### 📁 Yöntem 3: Doğrudan Dosya Yolu Belirterek Çalıştırma
+
+Global CLI yerine doğrudan derlenmiş `dist/index.js` dosyasını çağırmak isterseniz:
+
+```json
+{
+  "mcpServers": {
+    "roblox-universal-studio": {
+      "command": "node",
+      "args": [
+        "<PROJE_KLASORUNUZ_TAM_YOLU>/dist/index.js"
+      ]
+    }
+  }
+}
+```
+*(Örnek Windows: `C:\\Projects\\Roblox-Studio-MCP\\dist\\index.js` | macOS: `/Users/username/Projects/Roblox-Studio-MCP/dist/index.js`)*
 
 ---
 
