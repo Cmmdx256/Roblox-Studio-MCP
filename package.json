@@ -1,0 +1,51 @@
+{
+  "name": "roblox-studio-universal-mcp",
+  "version": "1.0.0",
+  "description": "Production-grade, deeply embedded Universal MCP system and AI runtime for Roblox Studio",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "roblox-studio-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx mcp-server/src/index.ts",
+    "test": "tsx --test mcp-server/tests/server.test.ts",
+    "bundle:plugin": "node scripts/bundle-plugin.js"
+  },
+  "keywords": [
+    "roblox",
+    "roblox-studio",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "luau",
+    "automation",
+    "claude",
+    "cursor"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "selfsigned": "^5.5.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.24.2",
+    "zod-to-json-schema": "^3.25.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.13.9",
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "allowScripts": {
+    "selfsigned@5.5.0": true
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "RobloxStudioUniversalMCP",
+  "tree": {
+    "$className": "Folder",
+    "Main": {
+      "$path": "src/Main.server.luau"
+    },
+    "Config": {
+      "$path": "src/Config.luau"
+    },
+    "Utils": {
+      "$path": "src/Utils"
+    },
+    "Addressing": {
+      "$path": "src/Addressing"
+    },
+    "Adapters": {
+      "$path": "src/Adapters"
+    },
+    "Context": {
+      "$path": "src/Context"
+    },
+    "Observation": {
+      "$path": "src/Observation"
+    },
+    "Core": {
+      "$path": "src/Core"
+    },
+    "Bridge": {
+      "$path": "src/Bridge"
+    },
+    "UI": {
+      "$path": "src/UI"
+    }
+  }
+}

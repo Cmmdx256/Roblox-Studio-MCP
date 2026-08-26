@@ -1,0 +1,33 @@
+--!strict
+local ErrorCodes = {
+	INVALID_ARGUMENT = "INVALID_ARGUMENT",
+	INSTANCE_NOT_FOUND = "INSTANCE_NOT_FOUND",
+	PROPERTY_NOT_FOUND = "PROPERTY_NOT_FOUND",
+	PROPERTY_READ_ONLY = "PROPERTY_READ_ONLY",
+	TYPE_COERCION_FAILED = "TYPE_COERCION_FAILED",
+	SCRIPT_NOT_FOUND = "SCRIPT_NOT_FOUND",
+	SCRIPT_NOT_EDITABLE = "SCRIPT_NOT_EDITABLE",
+	SCRIPT_PATCH_FAILED = "SCRIPT_PATCH_FAILED",
+	UNSUPPORTED_OPERATION = "UNSUPPORTED_OPERATION",
+	UNSUPPORTED_BY_ROBLOX_PLUGIN_API = "UNSUPPORTED_BY_ROBLOX_PLUGIN_API",
+	PERMISSION_DENIED = "PERMISSION_DENIED",
+	PLAYTEST_NOT_ACTIVE = "PLAYTEST_NOT_ACTIVE",
+	EXECUTION_FAILED = "EXECUTION_FAILED",
+	INTERNAL_ERROR = "INTERNAL_ERROR",
+}
+
+export type ErrorObject = {
+	code: string,
+	message: string,
+	details: { [string]: any }?,
+}
+
+function ErrorCodes.Create(code: string, message: string, details: { [string]: any }?): ErrorObject
+	return {
+		code = code,
+		message = message,
+		details = details or {},
+	}
+end
+
+return ErrorCodes
