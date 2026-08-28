@@ -5567,6 +5567,7 @@ local Transport = {}
 
 local isRunning = false
 local hasShownActivationAlert = false
+local bridgeToken: string? = nil
 
 function Transport.ShowActivationAlert(baseUrl: string)
 	if hasShownActivationAlert then return end
@@ -5616,6 +5617,15 @@ function Transport.Handshake(): boolean
 	end)
 
 	if success and response and response.StatusCode == 200 then
+		local decodeSuccess, data = pcall(function()
+			return HttpService:JSONDecode(response.Body)
+		end)
+		if not decodeSuccess or type(data) ~= "table" or type(data.bridgeToken) ~= "string" then
+			State.SetSubsystem("MCP", "OFFLINE")
+			Logger.Warn("MCP Bridge handshake did not return a session token")
+			return false
+		end
+		bridgeToken = data.bridgeToken
 		State.SetSubsystem("HTTP", "OK")
 		State.SetSubsystem("MCP", "CONNECTED")
 		Logger.Log("Connected to MCP Bridge at", Config.GetBaseUrl())
@@ -5635,6 +5645,12 @@ function Transport.Handshake(): boolean
 end
 
 function Transport.SendResponse(payload: { [string]: any })
+	if not bridgeToken then
+		Logger.Warn("Refusing to send command response before bridge session authentication")
+		return
+	end
+	payload.sessionId = State.SessionId
+	payload.bridgeToken = bridgeToken
 	local url = Config.GetBaseUrl() .. "/api/response"
 	pcall(function()
 		HttpService:RequestAsync({
@@ -5661,6 +5677,7 @@ function Transport.Start()
 			local events = ObservationEngine.DrainEvents(25)
 			local pollPayload = {
 				sessionId = State.SessionId,
+				bridgeToken = bridgeToken,
 				events = events,
 			}
 

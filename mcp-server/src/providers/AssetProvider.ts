@@ -12,7 +12,7 @@ import {
     SecurityLevel,
     VerificationMethod
 } from './types.js';
-import { commandDispatcher } from '../dispatcher/commandDispatcher.js';
+import { assetIntelligenceEngine } from '../engines/AssetIntelligenceEngine.js';
 
 export class AssetProvider implements IProvider {
     public readonly name = 'asset-provider';
@@ -108,51 +108,62 @@ export class AssetProvider implements IProvider {
 
         try {
             if (action === 'asset.search' || action === 'asset_search' || action === 'search_asset') {
+                const results = await assetIntelligenceEngine.searchAssets(params.query || '', params.options);
                 return {
                     status: 'SUCCESS',
-                    success: true,
-                    data: [
-                        { assetId: '12345678', name: params.query || 'Model', qualityScore: 92, verified: true }
-                    ],
+                    verified: false,
+                    provider: this.name,
+                    tool: action,
+                    changes: [],
+                    evidence: [],
+                    warnings: [],
+                    errors: [],
+                    data: results,
                     duration: Date.now() - startTime
                 };
             }
 
             if (action === 'asset.insert' || action === 'asset_insert' || action === 'insert_asset') {
-                const res = await commandDispatcher.executeCommand('instance_create', {
-                    className: 'Model',
-                    parent: params.parent || 'Workspace',
-                    name: params.name || `Asset_${params.assetId || '0'}`
-                });
-                return {
-                    status: 'SUCCESS',
-                    success: true,
-                    data: res,
-                    duration: Date.now() - startTime,
-                    verified: true
-                };
+                return await assetIntelligenceEngine.insertAsset(params.assetId, params.parent, params.position);
             }
 
             if (action === 'asset.deduplicate' || action === 'asset_deduplicate') {
+                const duplicates = await assetIntelligenceEngine.detectDuplicates(params.scope);
                 return {
                     status: 'SUCCESS',
-                    success: true,
-                    data: { duplicateCount: 0, recommendations: [] },
+                    verified: false,
+                    provider: this.name,
+                    tool: action,
+                    changes: [],
+                    evidence: [],
+                    warnings: [],
+                    errors: [],
+                    data: { duplicateCount: duplicates.length, duplicates },
                     duration: Date.now() - startTime
                 };
             }
 
             return {
                 status: 'ERROR',
-                success: false,
-                message: `Unknown AssetProvider action: ${action}`,
+                verified: false,
+                provider: this.name,
+                tool: action,
+                changes: [],
+                evidence: [],
+                warnings: [],
+                errors: [`Unknown AssetProvider action: ${action}`],
                 duration: Date.now() - startTime
             };
         } catch (err: any) {
             return {
                 status: 'ERROR',
-                success: false,
-                message: err?.message || String(err),
+                verified: false,
+                provider: this.name,
+                tool: action,
+                changes: [],
+                evidence: [],
+                warnings: [],
+                errors: [err?.message || String(err)],
                 duration: Date.now() - startTime
             };
         }

@@ -121,7 +121,7 @@ export class ObservationProvider implements IProvider {
                         ]
                     },
                     duration: Date.now() - startTime,
-                    verified: true
+                    verified: false
                 };
             }
 

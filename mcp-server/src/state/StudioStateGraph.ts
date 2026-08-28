@@ -83,6 +83,14 @@ export class StudioStateGraph {
         };
     }
 
+    public getAllNodes(): NodeMetadata[] {
+        return Array.from(this.dataModelCache.values());
+    }
+
+    public getAllPaths(): string[] {
+        return Array.from(this.dataModelCache.keys());
+    }
+
     public clear(): void {
         this.sessionInfo = {};
         this.dataModelCache.clear();

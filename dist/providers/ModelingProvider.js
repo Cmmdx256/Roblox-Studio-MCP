@@ -106,7 +106,7 @@ export class ModelingProvider {
                 const quality = await this.inspectQuality(params.targetInstancePath || params.target);
                 return {
                     status: 'SUCCESS',
-                    verified: true,
+                    verified: false,
                     data: quality,
                     duration: Date.now() - startTime,
                 };
@@ -154,7 +154,7 @@ export class ModelingProvider {
         });
         return {
             status: 'SUCCESS',
-            verified: true,
+            verified: false,
             data: { model: createModelResult, primaryPart: createPrimaryPartResult, modelPath: `${parent}.${modelName}` },
             changes: [{ type: 'CREATE', details: `Generated 3D Model '${modelName}' from prompt "${prompt}"`, target: `${parent}.${modelName}` }],
             evidence: [{ type: 'MODEL', content: modelName, label: prompt }],
@@ -177,7 +177,7 @@ export class ModelingProvider {
         });
         return {
             status: 'SUCCESS',
-            verified: true,
+            verified: false,
             data: result,
             changes: [{ type: 'CREATE', details: `Created MaterialVariant '${materialName}'`, target: `MaterialService.${materialName}` }],
             evidence: [{ type: 'MATERIAL', content: materialName, label: prompt }],

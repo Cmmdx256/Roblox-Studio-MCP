@@ -37,7 +37,7 @@ export class WorldBuildingEngine {
         console.error(`[WorldBuildingEngine] Building full world atomically`);
         return {
             status: 'SUCCESS',
-            verified: true,
+            verified: false,
             changes: [],
             evidence: []
         };

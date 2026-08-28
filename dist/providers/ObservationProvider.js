@@ -98,7 +98,7 @@ export class ObservationProvider {
                         ]
                     },
                     duration: Date.now() - startTime,
-                    verified: true
+                    verified: false
                 };
             }
             return {

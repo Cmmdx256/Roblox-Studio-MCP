@@ -30,6 +30,8 @@ export declare class StudioStateGraph {
     getNode(path: string): NodeMetadata | undefined;
     isStale(path: string, expectedClassName?: string): boolean;
     getStateSnapshot(): Record<string, any>;
+    getAllNodes(): NodeMetadata[];
+    getAllPaths(): string[];
     clear(): void;
 }
 export declare const studioStateGraph: StudioStateGraph;

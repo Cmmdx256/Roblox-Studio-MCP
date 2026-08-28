@@ -1,0 +1,1 @@
+{"version":3,"file":"RealityReportEngine.d.ts","sourceRoot":"","sources":["../../mcp-server/src/reality/RealityReportEngine.ts"],"names":[],"mappings":"AAAA;;;;;;;;;;;;;GAaG;AAEH,OAAO,EAAE,aAAa,EAAE,MAAM,YAAY,CAAC;AAE3C,qBAAa,mBAAmB;IAC5B;;OAEG;IACI,oBAAoB,CAAC,MAAM,EAAE,aAAa,GAAG,MAAM;CAoH7D;AAED,eAAO,MAAM,mBAAmB,qBAA4B,CAAC"}

@@ -137,6 +137,7 @@ export class UniversalCapabilityEngine {
         const stepResults: any[] = [];
         const changes: any[] = [];
         const evidence: any[] = [];
+        let allStepsVerified = true;
 
         console.error(`[UniversalCapabilityEngine] Executing compiled plan '${plan.name}' (${plan.steps.length} steps)...`);
 
@@ -147,19 +148,23 @@ export class UniversalCapabilityEngine {
                 if (res.changes) changes.push(...res.changes);
                 if (res.evidence) evidence.push(...res.evidence);
 
-                if (res.status === 'ERROR' && !step.allowFailure) {
+                if (res.status !== 'SUCCESS' && !step.allowFailure) {
                     return {
-                        status: 'ERROR',
+                        status: res.status === 'BLOCKED' ? 'BLOCKED' : 'ERROR',
                         success: false,
                         code: FailureCode.EXECUTION_FAILED,
-                        message: `Step ${step.stepIndex} (${step.action}) failed: ${res.message || 'Execution error'}`,
+                        message: `Step ${step.stepIndex} (${step.action}) did not complete: ${res.message || res.status || 'Execution error'}`,
                         data: { stepResults },
                         changes,
                         evidence,
                         duration: Date.now() - startTime
                     };
                 }
+                if (res.status !== 'SUCCESS' || res.verified !== true) {
+                    allStepsVerified = false;
+                }
             } catch (err: any) {
+                allStepsVerified = false;
                 if (!step.allowFailure) {
                     return {
                         status: 'ERROR',
@@ -175,17 +180,22 @@ export class UniversalCapabilityEngine {
             }
         }
 
-        // Mark verified in compiler and graph
-        this.compiler.markVerified(plan.id);
+        // A compiled workflow is verified only when every primitive action has
+        // supplied its own independent verification evidence.
+        if (allStepsVerified) {
+            this.compiler.markVerified(plan.id);
+        }
 
         return {
-            status: 'SUCCESS',
+            status: allStepsVerified ? 'SUCCESS' : 'UNVERIFIED',
             success: true,
-            message: `Successfully executed compiled capability '${plan.name}' (${plan.steps.length} steps)`,
+            message: allStepsVerified
+                ? `Verified compiled capability '${plan.name}' (${plan.steps.length} steps)`
+                : `Compiled capability '${plan.name}' dispatched, but one or more steps lack independent Studio verification.`,
             data: { stepResults },
             changes,
             evidence,
-            verified: true,
+            verified: allStepsVerified,
             duration: Date.now() - startTime
         };
     }

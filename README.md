@@ -4,9 +4,16 @@
 [![Roblox Luau](https://img.shields.io/badge/Roblox-Luau-00A2FF.svg)](https://luau-lang.org/)
 [![MCP Protocol](https://img.shields.io/badge/MCP-2024--11--05-green.svg)](https://modelcontextprotocol.io/)
 [![Architecture](https://img.shields.io/badge/Architecture-11%20Specialized%20Providers-purple.svg)](#-mimari-ve-11-özel-sağlayıcı-provider)
-[![Tests](https://img.shields.io/badge/Tests-12%2F12%20Passing-brightgreen.svg)](#-test-ve-doğrulama)
+[![Reality status](https://img.shields.io/badge/Live%20Studio-Not%20Verified-orange.svg)](./VERIFICATION_REPORT.md)
 
 > **Universal Roblox AI Studio**, Roblox Studio'yu harici yapay zeka kodlama asistanları (Claude Desktop, Cursor, Antigravity, VS Code vb.) için **AI-Native, otonom ve çift yönlü bir geliştirme platformuna** dönüştüren yeni nesil Model Context Protocol (MCP) çalışma zamanıdır.
+
+> **Gerçeklik durumu — 2026-08-28:** Bu depo aktif geliştirme aşamasındadır.
+> TypeScript derlemesi ve odaklı offline gerçeklik testleri geçmektedir; canlı
+> Studio/DataModel/playtest/görsel doğrulama ise **NOT VERIFIED** durumundadır.
+> Ayrıntı için [VERIFICATION_REPORT.md](./VERIFICATION_REPORT.md) ve
+> [REALITY_AUDIT.md](./REALITY_AUDIT.md) dosyalarına bakın. Araç ya da provider
+> listesi, tek başına canlı Studio yeteneği kanıtı değildir.
 
 ---
 
@@ -319,4 +326,3 @@ Test çıktısı:
 ## 📄 Lisans
 
 Bu proje **MIT Lisansı** altında lisanslanmıştır. Roblox Studio ile AI-native oyun geliştirme deneyiminin keyfini çıkarın! 🎮⚡
-

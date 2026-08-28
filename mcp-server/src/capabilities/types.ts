@@ -1,3 +1,4 @@
+export * from './CapabilityContract.js';
 import { CapabilityState, ExecutionContext, ProviderType, RiskLevel, SecurityLevel, VerificationMethod } from '../providers/types.js';
 
 export type CapabilityNodeType = 'tool' | 'api' | 'provider' | 'workflow' | 'resource' | 'primitive' | 'capability';

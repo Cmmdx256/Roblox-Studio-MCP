@@ -1,105 +1,85 @@
-# System Architecture & Technical Specification
+# Roblox AI Game Development Platform — Architecture Specification
 
-The **Roblox Studio Embedded Universal MCP System** bridges modern AI coding assistants with Roblox Studio's live runtime.
+## 1. System Overview
 
----
+The **Roblox AI Game Development Platform** is an MCP-native, Roblox Studio-integrated, multi-model, verifiable, and autonomous development control plane. It operates on the core principle:
 
-## 1. High-Level Architecture
+$$\text{Command Executed} \ne \text{Command Verified}$$
+
+Instead of treating AI as a simple chatbot that blindly spits out Luau scripts, this platform provides a bidirectional, closed-loop development runtime between local/remote AI models and active Roblox Studio sessions.
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                   AI Coding Agent                     │
-│         (Claude Desktop, Cursor, Antigravity)          │
-└───────────────────────────┬────────────────────────────┘
-                            │ Standard MCP (stdio)
-┌───────────────────────────▼────────────────────────────┐
-│                 Node.js / TS MCP Server                │
-│  - Tool Registry (35+ Tools, Zod Validation)          │
-│  - Resource Registry (roblox:// URIs)                 │
-│  - Command Dispatcher (Promise Queue & Timeouts)       │
-│  - Event & Log Buffer                                 │
-│  - Local HTTP Bridge Server (127.0.0.1:38883)         │
-└───────────────────────────┬────────────────────────────┘
-                            │ Adaptive Long-Polling (HTTP POST)
-┌───────────────────────────▼────────────────────────────┐
-│           Roblox Studio Plugin (Luau Sandbox)          │
-│  - Bridge Client & Session Handshake                   │
-│  - Execution Queue & Task Serializer                   │
-│  - Command Router & Error Handler                     │
-│  - Universal Studio Engine                             │
-│    ├── InstanceResolver & UuidRegistry                 │
-│    ├── LuauTypeCoercion                                │
-│    ├── TransactionManager (ChangeHistoryService)       │
-│    ├── EventObserver (LogService, Selection, Tree)     │
-│    └── Adapters (Instance, Prop, Script, Terrain, ...) │
-│  - Studio DockWidget UI                                │
-└───────────────────────────┬────────────────────────────┘
-                            │ Studio Plugin APIs
-┌───────────────────────────▼────────────────────────────┐
-│        Roblox Studio DataModel / Services / Place      │
-└────────────────────────────────────────────────────────┘
+USER NATURAL INTENT
+    │
+    ▼
+AI ORCHESTRATOR 2.0 (mcp-server/src/orchestrator/AIOrchestrator.ts)
+    │── Intent Classifier & Requirement Extraction
+    │── Relevance-Aware Context Retrieval (ProjectContextEngine.ts)
+    │── Persistent Project Memory (ProjectMemory.ts)
+    │── Model Router & Multi-Model Selection (ModelRouter.ts)
+    │── DAG Task Graph Planner (AutonomousPlanner.ts)
+    │
+    ▼
+DOMAIN INTELLIGENCE ENGINES
+    │── UI Design & Component Compiler (UIDesignEngine.ts, UIComponentLibrary.ts)
+    │── Luau Code & Refactoring Engine (LuauIntelligenceEngine.ts, RefactoringEngine.ts)
+    │── Code Architecture & Framework Detection (CodeArchitectureEngine.ts)
+    │── Animation Authoring & Posing Engine (AnimationAuthoringEngine.ts)
+    │── Mechanic Card Registry & Workflows (MechanicCardRegistry.ts, WorkflowEngine.luau)
+    │── Asset Intelligence & Security Inspection (AssetSecurityEngine.ts, AssetIntelligenceEngine.ts)
+    │── Visual Feedback & QA Engine (VisualQAEngine.ts, PlaytestEngine.ts)
+    │── World Building & Procedural Layout (WorldBuildingEngine.ts, VisualConstructionEngine.ts)
+    │
+    ▼
+CAPABILITY SYSTEM & ROUTING
+    │── Capability Contracts & Declarative Specs (CapabilityContract.ts)
+    │── Unified Tool Registry & Dynamic Catalog (UnifiedToolRegistry.ts)
+    │── Provider Registry (11 Registered Providers) (ProviderRegistry.ts)
+    │── Dynamic Health-Aware Router 2.0 (CapabilityRouter.ts, HealthMonitor.ts)
+    │
+    ▼
+VERIFIABLE EXECUTION PIPELINE (ExecutionPipeline.ts)
+    │── Security & Risk Policy (SecurityEngine.ts: READ_ONLY to CRITICAL)
+    │── Idempotency Guard (IdempotencyGuard.ts: SAFE, REPEATABLE, SKIP)
+    │── Multi-Step Transactions & ChangeHistoryService (TransactionEngine.ts)
+    │── Precondition Validation ──► Execution ──► Observation ──► 5-State Verification
+    │── Autonomous Self-Healing Recovery (RecoveryEngine.ts)
+    │
+    ▼
+PROVIDER LAYER ──► ROBLOX STUDIO RUNTIME
+    ├── Embedded Studio Plugin (RobloxUniversalMCP.rbxmx) via HTTP/HTTPS Bridge (:38896/:38897)
+    └── Official Roblox Studio MCP (StudioMCP.exe / stdio transport)
 ```
 
 ---
 
-## 2. Communication Protocol & Transport
+## 2. Layered Responsibilities
 
-### Why Fast Long-Polling?
-Roblox Studio's Luau sandbox does not expose a raw TCP/WebSocket listening socket API. However, `HttpService:RequestAsync` provides high-throughput outbound HTTP requests to localhost.
+### Intelligence Layer (Node.js / TypeScript)
+- **Intent Engine**: Parses natural language requests into structured technical specifications.
+- **Project Intelligence**: Indexes DataModel instances, scripts, symbols, remotes, attributes, and tags.
+- **Model Router**: Routes tasks to specialized models (`fast-utility`, `luau-coder`, `ui-designer`, `deep-architect`, `vision-qa`).
+- **Domain Engines**: Synthesizes UI hierarchies, Luau code, animation grips/keyframes, and mechanic cards.
+- **Verification Engine**: Evaluates postconditions across 5 discrete evidence-based states (`VERIFIED`, `PARTIALLY_VERIFIED`, `FAILED`, `NOT_VERIFIABLE`, `UNKNOWN`).
+- **Recovery Engine**: Classifies runtime errors (`PROPERTY_RESTRICTION`, `NIL_INDEXING`, `SECURITY_RESTRICTION`, `SYNTAX_ERROR`) and synthesizes verified patches.
 
-1. **Handshake (`POST /api/handshake`)**:
-   * The plugin generates a session UUID and registers place metadata with the bridge.
-2. **Adaptive Polling (`POST /api/poll`)**:
-   * The plugin continuously requests queued commands.
-   * When idle, the poller waits with a 150ms interval.
-   * When commands are dispatched, the interval shifts to 20ms for instant execution.
-   * Any pending events (logs, selection changes, hierarchy events) are piggybacked on the poll request.
-3. **Response Dispatch (`POST /api/response`)**:
-   * When a command finishes execution, the result or structured error is posted back, resolving the pending Promise on the MCP server.
-
----
-
-## 3. Instance Addressing Model
-
-Roblox places often have multiple objects with identical names (e.g. dozens of parts named `"Part"` or `"Spawn"`). The Universal MCP system implements a two-tier addressing strategy:
-
-1. **Session UUID (`id://...`)**:
-   * On first inspect, create, clone, or traversal, the plugin assigns a unique session UUID stored in a weak-key table (`UuidRegistry`).
-   * This UUID remains stable even if the instance is renamed or moved across the DataModel.
-2. **Path Addressing with Indexing**:
-   * `Workspace.Map.Buildings.House01`
-   * `Workspace.Map.Roads.Part[3]` (indexes 3rd child named Part)
-   * `ReplicatedStorage.Modules.Config`
-   * `game.ServerScriptService.GameManager`
+### Execution Layer (Roblox Studio Plugin / Luau)
+- **Embedded Plugin Bridge**: Long-polling and WebSocket-ready HTTP client running inside Studio.
+- **Native DataModel Adapters**: Executes instance creation, property mutation, script source replacement, and selection manipulation with undo waypoint integration (`ChangeHistoryService`).
+- **Studio Observation**: Emits real-time logs, runtime errors, traceback details, and selection changes back to the MCP bridge.
 
 ---
 
-## 4. Script Editing & Code Search Pipeline
+## 3. Provider Architecture (11 Registered Providers)
 
-* **`ScriptEditorService` Integration**: Uses modern Studio APIs to read and update code in open document tabs without losing cursor position or undo history.
-* **Direct `Script.Source` Fallback**: If the document is closed, directly updates the source code property.
-* **Incremental Patching**:
-  * Exact substring replacement with regex pattern escaping.
-  * Regex search & replace.
-  * Line-based edits.
-* **Project-Wide Code Search**: Scans all `Script`, `LocalScript`, and `ModuleScript` containers across any specified scope (`game`, `ReplicatedStorage`, etc.) and returns structured snippets with line numbers.
-
----
-
-## 5. Transaction Safety & Undo/Redo
-
-All mutating operations (`instance_create`, `instance_delete`, `property_set`, `script_set_source`, `terrain_fill_block`, etc.) are wrapped in `TransactionManager`:
-* Calls `ChangeHistoryService:TryBeginRecording()` before execution.
-* On success, commits the transaction and creates a native Studio undo waypoint.
-* On error or cancelled batch, calls `ChangeHistoryService:FinishRecording(..., Cancel)` to revert changes cleanly.
-
----
-
-## 6. Type Coercion Engine
-
-Roblox engine data types are seamlessly converted between JSON and Luau:
-* **Vector3**: `[X, Y, Z]` or `{x, y, z}` or `{X, Y, Z}`
-* **Color3**: `[R, G, B]` (0-1 or 0-255) or `"#RRGGBB"` hex strings
-* **CFrame**: `[X, Y, Z]` position or full 12-component matrix
-* **UDim2**: `[sx, ox, sy, oy]`
-* **Enums**: `"Enum.Material.Neon"`, `"Material.Neon"`, or `"Neon"`
+1. `embedded-plugin`: Native execution inside Roblox Studio via the HTTP/HTTPS bridge.
+2. `official-roblox-mcp`: Direct integration with official Roblox Studio MCP binary.
+3. `modeling-provider`: 3D mesh, material, and procedural part generation.
+4. `animation-provider`: Keyframe sequences, Motor6D joint posing, and Tool grip calibration.
+5. `luau-provider`: Static analysis, linting, type-checking, and syntax patching.
+6. `workflow-provider`: Multi-step automation templates and mechanic cards.
+7. `asset-provider`: Asset search, security scanning, and safe insertion.
+8. `testing-provider`: Unit testing, scenario simulation, and output assertion.
+9. `diagnostics-provider`: Error diagnosis, traceback correlation, and safe repair.
+10. `observation-provider`: Structured DataModel, script, and session state inspection.
+11. `design-provider`: Spatial composition, lighting setup, and design tokens.

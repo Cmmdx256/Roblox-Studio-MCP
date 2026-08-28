@@ -142,7 +142,7 @@ export class VisualConstructionEngine {
             });
             return {
                 status: 'SUCCESS',
-                verified: true,
+                verified: false,
                 provider: 'visual-construction-engine',
                 tool: 'component_compose',
                 data: {
@@ -238,7 +238,7 @@ return {
             });
             return {
                 status: 'SUCCESS',
-                verified: true,
+                verified: false,
                 provider: 'visual-construction-engine',
                 tool: 'hierarchy_scaffold',
                 data: res,

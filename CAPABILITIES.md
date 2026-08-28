@@ -24,8 +24,16 @@ Every capability registered in the system contains explicit security, execution 
 | `animation.integrate` | AnimationProvider | `PluginSecurity` | Edit | `AVAILABLE` | `MEDIUM` | VerificationEngine |
 | `generate_mesh` | Official Roblox MCP | `LocalUserSecurity` | Edit | `OFFICIAL_ONLY` | `MEDIUM` | Screenshot |
 | `generate_material` | Official Roblox MCP | `LocalUserSecurity` | Edit | `OFFICIAL_ONLY` | `LOW` | Read-Back |
-| `execute_luau` | Official Roblox MCP | `PluginSecurity` | Edit/Play | `OFFICIAL_ONLY` | `HIGH` | Console Output |
 | `screen_capture` | Official Roblox MCP | `LocalUserSecurity` | Playtest | `OFFICIAL_ONLY` | `READ_ONLY` | Screenshot |
+| `orchestrator_execute` | AIOrchestrator | `SAFE` | Studio | `AVAILABLE` | `HIGH` | 5-State Verification |
+| `ui_design_create` | UIDesignEngine | `PluginSecurity` | Edit | `AVAILABLE` | `MEDIUM` | Read-Back |
+| `ui_theme_apply` | UIDesignTokens | `SAFE` | Studio | `AVAILABLE` | `READ_ONLY` | None |
+| `ui_critique` | VisualQAEngine | `SAFE` | Studio | `AVAILABLE` | `READ_ONLY` | Geometric |
+| `project_memory_inspect` | ProjectMemory | `SAFE` | Studio | `AVAILABLE` | `READ_ONLY` | None |
+| `code_refactor_analyze` | RefactoringEngine | `SAFE` | Edit | `AVAILABLE` | `READ_ONLY` | AST Analysis |
+| `mechanic_card_instantiate` | MechanicCardRegistry | `PluginSecurity` | Edit | `AVAILABLE` | `MEDIUM` | VerificationEngine |
+| `asset_security_scan` | AssetSecurityEngine | `SAFE` | Studio | `AVAILABLE` | `READ_ONLY` | Static Analysis |
+| `model_route_query` | ModelRouter | `SAFE` | Studio | `AVAILABLE` | `READ_ONLY` | None |
 
 ---
 

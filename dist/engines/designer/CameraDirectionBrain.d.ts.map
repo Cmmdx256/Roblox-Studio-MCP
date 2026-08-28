@@ -1,0 +1,1 @@
+{"version":3,"file":"CameraDirectionBrain.d.ts","sourceRoot":"","sources":["../../../mcp-server/src/engines/designer/CameraDirectionBrain.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAE,SAAS,EAAE,MAAM,YAAY,CAAC;AAElD,qBAAa,oBAAoB;IAC7B;;OAEG;IACI,YAAY,CAAC,KAAK,EAAE,SAAS,EAAE,KAAK,EAAE,MAAM,GAAG,SAAS,EAAE;CA0DpE;AAED,eAAO,MAAM,oBAAoB,sBAA6B,CAAC"}

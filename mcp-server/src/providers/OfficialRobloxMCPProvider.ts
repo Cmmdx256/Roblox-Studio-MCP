@@ -113,6 +113,15 @@ export class OfficialRobloxMCPProvider implements IProvider {
     ];
 
     public async initialize(): Promise<void> {
+        // Test processes must never launch or attach to StudioMCP.  The
+        // embedded bridge has a matching guard; keeping both boundaries closed
+        // prevents an offline test suite from touching a creator's open place.
+        if (process.env.ROBLOX_MCP_TEST_MODE === '1') {
+            this.isConnected = false;
+            this.connectionMessage = 'Official Roblox StudioMCP is disabled for ROBLOX_MCP_TEST_MODE.';
+            return;
+        }
+
         try {
             const cmdConfig = findStudioMcpCommand();
 

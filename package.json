@@ -12,7 +12,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx mcp-server/src/index.ts",
-    "test": "tsx --test mcp-server/tests/server.test.ts",
+    "test": "set ROBLOX_MCP_TEST_MODE=1&& tsx --test mcp-server/tests/*.test.ts",
     "bundle:plugin": "node scripts/bundle-plugin.js"
   },
   "keywords": [

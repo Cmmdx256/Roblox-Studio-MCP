@@ -20,7 +20,10 @@ export class CapabilityProbe {
                     error: 'Studio session is not connected for probing.'
                 };
             }
-            // Probe session state from in-memory cache
+            // Session availability is useful context, but it is not a
+            // capability proof. A probe must execute registered read-only
+            // assertions and preserve their Studio evidence before it can
+            // return passed=true.
             const session = commandDispatcher.getActiveSession();
             evidence.push({ type: 'studio_session_probe', data: session });
             // Check if any step touches protected services or high-risk paths
@@ -32,10 +35,11 @@ export class CapabilityProbe {
             }
             return {
                 capabilityId: capability.id,
-                passed: true,
+                passed: false,
                 durationMs: Date.now() - startTime,
                 sideEffectsDetected,
-                evidence
+                evidence,
+                error: 'No executable read-only assertions are registered for this capability plan; session presence is not verification.'
             };
         }
         catch (err) {

@@ -31,7 +31,7 @@ export declare class CapabilityRouter {
      */
     getRestrictedHierarchyTree(): Record<string, RestrictedCapabilityDescriptor[]>;
     /**
-     * Route a request to the best available provider.
+     * Route a request to the best available provider based on health and priority.
      */
     route(action: string, params: Record<string, any>): Promise<ExecutionResult>;
     private isRetryableError;

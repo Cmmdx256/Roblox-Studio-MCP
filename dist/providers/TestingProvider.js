@@ -67,30 +67,35 @@ export class TestingProvider {
         console.error(`[TestingProvider] Executing testing action: ${action}`);
         try {
             if (action === 'testing.assert_instance' || action === 'testing_assert_instance') {
-                const target = params.path || 'Workspace';
-                const inspectRes = await commandDispatcher.executeCommand('studio_inspect', { path: target });
+                const target = params.target || params.path || 'Workspace';
+                const inspectRes = await commandDispatcher.executeCommand('instance_get_details', { target });
                 return {
                     status: 'SUCCESS',
                     success: true,
-                    data: { target, passed: true, inspection: inspectRes },
+                    // This tool currently gathers a real DataModel observation;
+                    // it does not invent an assertion result when no explicit
+                    // expected state was supplied.
+                    data: { target, inspection: inspectRes, assertionState: 'UNVERIFIED' },
                     duration: Date.now() - startTime,
-                    verified: true
+                    verified: false
                 };
             }
             if (action === 'testing.run_suite' || action === 'testing_run_suite') {
                 const suiteName = params.suite || 'SmokeTest';
                 return {
-                    status: 'SUCCESS',
-                    success: true,
+                    // The embedded plugin has no generic in-Studio test-suite
+                    // runner.  Reporting fabricated counts here used to make
+                    // an unavailable capability look like a passing playtest.
+                    status: 'BLOCKED',
+                    success: false,
+                    code: 'BLOCKED_BY_PLATFORM',
+                    message: 'No real in-Studio test-suite runner is installed. Use explicit verified scenarios or connect a supported runner.',
                     data: {
                         suite: suiteName,
-                        totalTests: 5,
-                        passed: 5,
-                        failed: 0,
-                        durationMs: 120
+                        state: 'BLOCKED_BY_PLATFORM'
                     },
                     duration: Date.now() - startTime,
-                    verified: true
+                    verified: false
                 };
             }
             return {

@@ -118,7 +118,7 @@ export class DiagnosticsEngine {
         console.error(`[DiagnosticsEngine] Applying safe repair to: ${patchSpec.scriptPath} (dryRun: ${patchSpec.dryRun})`);
         return {
             status: 'SUCCESS',
-            verified: true,
+            verified: false,
             changes: [],
             evidence: []
         };

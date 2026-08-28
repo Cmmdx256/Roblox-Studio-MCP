@@ -12,12 +12,26 @@ export class CommandDispatcher {
     pollWaiters = [];
     constructor() {
         // Clean up stale sessions
-        setInterval(() => this.checkSessionLiveness(), 10000);
+        const t1 = setInterval(() => this.checkSessionLiveness(), 10000);
+        t1.unref();
         // Background sync with shared daemon if this process is not the primary listener
-        setInterval(() => this.syncWithSharedDaemon(), 2000);
+        const t2 = setInterval(() => this.syncWithSharedDaemon(), 2000);
+        t2.unref();
         this.syncWithSharedDaemon();
     }
+    /**
+     * Test processes must never discover or forward commands to a creator's
+     * real Studio daemon.  Unit/integration tests can still register their own
+     * in-memory session explicitly, but remote bridge discovery is disabled.
+     */
+    isRemoteProxyDisabled() {
+        return process.env.ROBLOX_MCP_TEST_MODE === '1';
+    }
     async syncWithSharedDaemon() {
+        if (this.isRemoteProxyDisabled()) {
+            this.remoteActiveSession = null;
+            return;
+        }
         if (this.activeSession)
             return; // This process is already the primary listener
         try {
@@ -85,6 +99,19 @@ export class CommandDispatcher {
         }
         return null;
     }
+    /**
+     * Refreshes the bridge-owned session for secondary MCP processes.  A process
+     * that did not start the HTTP listener has no synchronous local session, so
+     * callers that need a truthful connection decision must await this first.
+     */
+    async refreshSessionInfo() {
+        await this.syncWithSharedDaemon();
+        return this.getSessionInfo();
+    }
+    clearSession() {
+        this.activeSession = null;
+        this.remoteActiveSession = null;
+    }
     getActiveSession() {
         return this.activeSession || this.remoteActiveSession;
     }
@@ -95,6 +122,12 @@ export class CommandDispatcher {
         }
         // 2. If running as a secondary process, forward to the shared bridge daemon
         try {
+            if (this.isRemoteProxyDisabled()) {
+                throw {
+                    code: ErrorCode.NO_STUDIO_CONNECTED,
+                    message: 'Remote Studio proxy is disabled for the test process.',
+                };
+            }
             const statusRes = await fetch(`http://${DEFAULT_CONFIG.host}:${DEFAULT_CONFIG.port}/health`);
             if (statusRes.ok) {
                 const healthData = await statusRes.json();
@@ -136,6 +169,7 @@ export class CommandDispatcher {
             action,
             params,
             timestamp: Date.now(),
+            sessionId: this.activeSession?.sessionId,
         };
         return new Promise((resolve, reject) => {
             const timer = setTimeout(() => {
@@ -168,8 +202,8 @@ export class CommandDispatcher {
         this.heartbeat(sessionId);
         // If there are already queued commands, return them immediately
         if (this.pendingQueue.length > 0) {
-            const commands = [...this.pendingQueue];
-            this.pendingQueue = [];
+            const commands = this.pendingQueue.filter(command => !command.sessionId || command.sessionId === sessionId);
+            this.pendingQueue = this.pendingQueue.filter(command => command.sessionId && command.sessionId !== sessionId);
             return Promise.resolve(commands);
         }
         // Otherwise, wait for commands or timeout
@@ -192,6 +226,12 @@ export class CommandDispatcher {
         const { id, success, result, error } = response;
         const pending = this.inFlightCommands.get(id);
         if (!pending) {
+            return false;
+        }
+        // A command response is valid only from the Studio session to which that
+        // command was dispatched.  This prevents an unrelated bridge client from
+        // converting an acknowledgement into apparent Studio evidence.
+        if (!response.sessionId || response.sessionId !== pending.request.sessionId) {
             return false;
         }
         clearTimeout(pending.timer);

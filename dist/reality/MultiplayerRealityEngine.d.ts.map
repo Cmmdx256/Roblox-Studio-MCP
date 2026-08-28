@@ -1,0 +1,1 @@
+{"version":3,"file":"MultiplayerRealityEngine.d.ts","sourceRoot":"","sources":["../../mcp-server/src/reality/MultiplayerRealityEngine.ts"],"names":[],"mappings":"AAAA;;;;;;;;GAQG;AAIH,OAAO,EAAE,wBAAwB,EAAsB,MAAM,YAAY,CAAC;AAE1E,qBAAa,wBAAwB;IACjC;;OAEG;IACU,gBAAgB,IAAI,OAAO,CAAC,wBAAwB,CAAC;CAiFrE;AAED,eAAO,MAAM,wBAAwB,0BAAiC,CAAC"}

@@ -78,7 +78,7 @@ return {
             });
             return {
                 status: 'SUCCESS',
-                verified: true,
+                verified: false,
                 provider: 'animation-authoring-engine',
                 tool: 'tool_grip_calibrate',
                 data: res,
@@ -153,7 +153,7 @@ return {
             });
             return {
                 status: 'SUCCESS',
-                verified: true,
+                verified: false,
                 provider: 'animation-authoring-engine',
                 tool: 'rig_pose_and_animate',
                 data: res,
@@ -230,7 +230,7 @@ return {
             });
             return {
                 status: 'SUCCESS',
-                verified: true,
+                verified: false,
                 provider: 'animation-authoring-engine',
                 tool: 'keyframe_sequence_create',
                 data: res,

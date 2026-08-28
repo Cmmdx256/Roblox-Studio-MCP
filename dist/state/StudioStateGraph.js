@@ -57,6 +57,12 @@ export class StudioStateGraph {
             cacheSize: this.dataModelCache.size
         };
     }
+    getAllNodes() {
+        return Array.from(this.dataModelCache.values());
+    }
+    getAllPaths() {
+        return Array.from(this.dataModelCache.keys());
+    }
     clear() {
         this.sessionInfo = {};
         this.dataModelCache.clear();

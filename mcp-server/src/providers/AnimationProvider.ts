@@ -152,7 +152,7 @@ export class AnimationProvider implements IProvider {
         const result = await this.inspectAnimation(params.target);
         return {
           status: 'SUCCESS',
-          verified: true,
+          verified: false,
           data: result,
           duration: Date.now() - startTime,
         };
@@ -167,7 +167,7 @@ export class AnimationProvider implements IProvider {
         const result = await this.validateAnimation(params.targetPath);
         return {
           status: 'SUCCESS',
-          verified: true,
+          verified: false,
           data: result,
           duration: Date.now() - startTime,
         };
@@ -176,7 +176,7 @@ export class AnimationProvider implements IProvider {
         const result = await this.planAnimationFromNL(params.prompt || params.naturalLanguagePrompt);
         return {
           status: 'SUCCESS',
-          verified: true,
+          verified: false,
           data: result,
           duration: Date.now() - startTime,
         };
@@ -230,7 +230,7 @@ export class AnimationProvider implements IProvider {
 
     return {
       status: 'SUCCESS',
-      verified: true,
+      verified: false,
       data: result,
       changes: [{ type: 'CREATE', details: `Created Animation ${name}`, target: `${parent}.${name}` }],
       evidence: [{ type: 'ANIMATION', content: formattedId, label: name }],
@@ -281,7 +281,7 @@ return {
 
     return {
       status: 'SUCCESS',
-      verified: true,
+      verified: false,
       data: result,
       changes: [{ type: 'CREATE', details: `Integrated animation ${params.animationName}`, target: params.characterOrRig }],
       evidence: [{ type: 'SCRIPT', content: scriptSource, label: `${params.animationName}Controller` }],

@@ -1,0 +1,101 @@
+﻿[HTTP  Bridge] Ô£à Listening on http://127.0.0.1:39465
+[HTTPS Bridge] Ô£à Listening on https://127.0.0.1:39466
+ÔûÂ Roblox Studio Universal MCP Test Suite
+  Ô£ö Tool Registry contains all 36 universal tools (0.9505ms)
+  Ô£ö HTTP Bridge Status returns disconnected when no session is active (24.5318ms)
+  Ô£ö HTTP Bridge Handshake registers studio session (17.2896ms)
+  Ô£ö Executing a command dispatches over polling RPC and resolves with response (5.8509ms)
+[WorkflowLibrary] Registered workflow template: Day Night Cycle Setup (scripting)
+[WorkflowLibrary] Registered workflow template: Player Leaderstats Setup (scripting)
+[WorkflowLibrary] Registered workflow template: Procedural Island Generator (world_building)
+[ProviderRegistry] Registered provider: embedded-plugin (EMBEDDED_PLUGIN)
+[ProviderRegistry] Registered provider: official-roblox-mcp (OFFICIAL_ROBLOX_MCP)
+[ProviderRegistry] Registered provider: modeling-provider (MODELING)
+[ProviderRegistry] Registered provider: animation-provider (ANIMATION)
+[ProviderRegistry] Registered provider: luau-provider (LUAU)
+[ProviderRegistry] Registered provider: workflow-provider (WORKFLOW)
+[ProviderRegistry] Registered provider: asset-provider (ASSET)
+[ProviderRegistry] Registered provider: testing-provider (TESTING)
+[ProviderRegistry] Registered provider: diagnostics-provider (DIAGNOSTICS)
+[ProviderRegistry] Registered provider: observation-provider (OBSERVATION)
+[ProviderRegistry] Registered provider: design-provider (DESIGN)
+[ProviderRegistry] Initializing 11 providers...
+[EmbeddedPluginProvider] Initializing Embedded Plugin Provider...
+[ProviderRegistry] Provider 'embedded-plugin' initialized successfully.
+[OfficialRobloxMCPProvider] Using official Roblox MCP launcher: Direct StudioMCP.exe binary (C:\Users\Theso\AppData\Local\Roblox\Versions\version-268c7d941ba34c1a\StudioMCP.exe)
+  Ô£ö Events ingestion buffers logs and error messages (2.8971ms)
+  Ô£ö Project Resources can be read via URI (0.7667ms)
+[OfficialRobloxMCPProvider] Successfully connected to official StudioMCP!
+[ProviderRegistry] Provider 'official-roblox-mcp' initialized successfully.
+[ModelingProvider] Initialized
+[ProviderRegistry] Provider 'modeling-provider' initialized successfully.
+[AnimationProvider] Initialized
+[ProviderRegistry] Provider 'animation-provider' initialized successfully.
+[LuauProvider] Initialized Luau intelligence & execution provider.
+[ProviderRegistry] Provider 'luau-provider' initialized successfully.
+[WorkflowProvider] Initialized Workflow Provider with registered templates.
+[ProviderRegistry] Provider 'workflow-provider' initialized successfully.
+[AssetProvider] Initialized Asset Provider.
+[ProviderRegistry] Provider 'asset-provider' initialized successfully.
+[TestingProvider] Initialized Testing Provider.
+[ProviderRegistry] Provider 'testing-provider' initialized successfully.
+[DiagnosticsProvider] Initialized Diagnostics Provider.
+[ProviderRegistry] Provider 'diagnostics-provider' initialized successfully.
+[ObservationProvider] Initialized Observation Provider.
+[ProviderRegistry] Provider 'observation-provider' initialized successfully.
+[DesignProvider] Initialized Designer Brain Provider.
+[ProviderRegistry] Provider 'design-provider' initialized successfully.
+[UniversalCapabilityEngine] Resolving capability for: 'studio_inspect'
+[UniversalCapabilityEngine] Resolving capability for: 'Align fishing boats to shoreline'
+[CapabilityProbe] Probing capability 'Align fishing boats to shoreline' (4 steps)...
+[MultiModeEngine] Mode transitioned: CHAT -> OBSERVE (reason: Read only scan)
+[MultiModeEngine] Mode transitioned: OBSERVE -> BUILD (reason: Constructing assets)
+[MultiModeEngine] Mode transitioned: BUILD -> AUTONOMOUS (reason: Started autonomous goal: Create complete fishing village)
+  Ô£ö 11 Providers are registered and operational in ProviderRegistry (349.9138ms)
+  Ô£ö Universal Capability Engine resolves across 4-tier hierarchy (1.8395ms)
+  Ô£ö MultiModeEngine handles operating mode transitions and permissions (1.2141ms)
+  Ô£ö Live Dashboard endpoint returns comprehensive real-time telemetry (3.3106ms)
+  Ô£ö Visual Construction Engine lists rich archetypes and templates (0.7586ms)
+  Ô£ö Animation Authoring Engine calibrates tool grips and keyframe sequences (0.5116ms)
+  Ô£ö Verification Engine 2.0 evaluates conditions with 5-state reports and evidence (3.1402ms)
+  Ô£ö Idempotency Guard detects redundant creations and script mutations (2.2896ms)
+[TransactionEngine] Started transaction 9591d2fc-407e-446f-a063-63ba5cc0d0e5: "Unit Test Transaction"
+[TransactionEngine] Committed transaction 9591d2fc-407e-446f-a063-63ba5cc0d0e5
+[TransactionEngine] Started transaction 32098075-b975-429e-8fc9-61202917634e: "Rollback Test"
+[TransactionEngine] Rollback finished for 32098075-b975-429e-8fc9-61202917634e with state ROLLED_BACK
+[RecoveryEngine] Applying recovery option: Replace direct limb Motor6D access with safe UpperTorso/Torso joint search. (confidence: 0.95)
+[ProjectMemory] Registered system: FishingSystem at Workspace.FishingSystem
+[AIOrchestrator] Starting OS Pipeline for intent: "Create an interactive door and gold coin pickup system" (mode: DRY_RUN)
+[AIOrchestrator] Starting OS Pipeline for intent: "Create a polished fishing game where every fish has a different sale value. The player casts a rod, catches fish, stores them in a bucket/inventory, takes them to a seller NPC, sells them for their individual values, and the UI should have polished fishing-themed animations." (mode: AUTONOMOUS)
+[AIOrchestrator] Executing stage 1 operation: OP-001 - Create individual FishData module with ID, rarity, and individual sale values
+  Ô£ö Transaction Engine coordinates lifecycle with begin, commit and rollback (6.9513ms)
+  Ô£ö Security Engine evaluates operation risk and blocks protected internal services (3.1026ms)
+  Ô£ö Autonomous Recovery Engine classifies errors and synthesizes repairs (2.7632ms)
+  Ô£ö Project Context Engine ranks task-relevant entities and limits token usage (3.2431ms)
+  Ô£ö Health Monitor audits all providers and computes unified health status (3.3679ms)
+  Ô£ö Model Router selects optimal AI models based on intent capabilities (2.4097ms)
+  Ô£ö UI Design Engine compiles intermediate UI specification with design tokens (10.0641ms)
+  Ô£ö Project Memory records structured systems, decisions, and error memories (2.1402ms)
+  Ô£ö Refactoring and Code Architecture Engines analyze scripts and detect frameworks (4.0733ms)
+  Ô£ö Mechanic Card Registry instantiates customizable verified cards (2.5571ms)
+  Ô£ö Asset Security Engine detects backdoors and classifies malicious scripts (2.131ms)
+  Ô£ö Visual QA Engine performs geometric bounding calculation and detects defects (1.8985ms)
+  Ô£ö AI Orchestrator 2.0 creates complete verifiable task plans in DRY_RUN mode (15.2291ms)
+  Ô£ö Event Bus emits platform events and notifies registered handlers (0.6133ms)
+  Ô£ö Project Knowledge Graph computes impact analysis and dependents (0.655ms)
+  Ô£ö Animation DSL Engine compiles keyframes into native Luau state machine (2.0442ms)
+  Ô£ö Camera Engine generates cinematic controllers with shake support (1.7533ms)
+  Ô£ö Multiplayer QA Engine detects unvalidated client-authoritative vulnerabilities (1.9698ms)
+[AIOrchestrator] Executing stage 2 operation: OP-002 - Create CastRodEvent for server-side fishing cast coordination
+[AIOrchestrator] Executing stage 2 operation: OP-003 - Create SellFishEvent for authoritative NPC selling
+[AIOrchestrator] Executing stage 3 operation: OP-004 - Create server InventoryService for player bucket storage
+[AIOrchestrator] Executing stage 3 operation: OP-005 - Create server SellService to calculate individual fish values and grant coins
+[AIOrchestrator] Executing stage 4 operation: OP-006 - Create responsive fishing HUD with theme tokens, balance display, and catch dialog
+[UIDesignEngine] Constructing ScreenGui: FishingGui with theme 'fishing_casual'
+[AIOrchestrator] Executing stage 5 operation: OP-007 - Calibrate fishing rod tool grip and create casting animation logic
+[AIOrchestrator] Executing stage 6 operation: OP-008 - Verify all machine-checkable acceptance criteria
+[BuildHistory] Recorded Build #1 (build_001): "Technical Specification for: Fishing Simulation / RPG" -> status: VERIFIED_COMMIT
+[ProjectMemory] Registered system: Fishing Simulation / RPG at Workspace.FishingSimulationRPG
+  Ô£û End-to-End Golden Scenario: Create complete polished fishing game system (15.2414ms)
+Ô£û Roblox Studio Universal MCP Test Suite (521.593ms)
+2026-08-28T08:15:07.046229Z ERROR StudioMCP::proxy_server::ws_client: WebSocket error: IO error: Varolan bir ba─şlant─▒ uzaktaki bir ana bilgisayar taraf─▒ndan zorla kapat─▒ld─▒. (os error 10054)

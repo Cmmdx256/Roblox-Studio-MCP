@@ -93,7 +93,7 @@ export class WorkflowProvider implements IProvider {
                 message: `Successfully executed workflow '${template.name}'`,
                 data: res,
                 duration: Date.now() - startTime,
-                verified: true
+                verified: false
             };
         } catch (err: any) {
             return {

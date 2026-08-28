@@ -1,20 +1,23 @@
 export interface PerformanceAuditReport {
     score: number;
-    instanceCountEstimate: number;
+    measuredLive: boolean;
+    instanceCount: number;
     unanchoredPartsCount: number;
     heavyConnectionsCount: number;
+    physicsBudgetValid: boolean;
+    renderingBudgetValid: boolean;
     warnings: string[];
     recommendations: string[];
 }
 export declare class PerformanceEngine {
     /**
-     * Evaluates game runtime performance budget and structural complexity.
+     * Evaluates game runtime performance budget from live Studio DataModel or cached Knowledge Graph.
      */
-    evaluatePerformance(stats: {
+    evaluatePerformance(explicitStats?: {
         totalInstances?: number;
         unanchoredParts?: number;
         renderSteppedCount?: number;
-    }): PerformanceAuditReport;
+    }): Promise<PerformanceAuditReport>;
 }
 export declare const performanceEngine: PerformanceEngine;
 //# sourceMappingURL=PerformanceEngine.d.ts.map

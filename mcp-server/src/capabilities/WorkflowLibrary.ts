@@ -58,12 +58,12 @@ export class WorkflowLibrary {
                 intent: 'setup day night cycle',
                 description: 'Day night cycle lighting script',
                 steps: [],
-                confidence: 1.0,
-                verified: true,
+                confidence: 0,
+                verified: false,
                 reusable: true,
                 createdAt: Date.now()
             },
-            verified: true,
+            verified: false,
             usageCount: 0
         });
 
@@ -79,12 +79,12 @@ export class WorkflowLibrary {
                 intent: 'setup leaderstats',
                 description: 'Leaderstats script in ServerScriptService',
                 steps: [],
-                confidence: 1.0,
-                verified: true,
+                confidence: 0,
+                verified: false,
                 reusable: true,
                 createdAt: Date.now()
             },
-            verified: true,
+            verified: false,
             usageCount: 0
         });
 
@@ -100,12 +100,12 @@ export class WorkflowLibrary {
                 intent: 'generate island',
                 description: 'Voxel terrain island generation',
                 steps: [],
-                confidence: 1.0,
-                verified: true,
+                confidence: 0,
+                verified: false,
                 reusable: true,
                 createdAt: Date.now()
             },
-            verified: true,
+            verified: false,
             usageCount: 0
         });
     }

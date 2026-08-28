@@ -1,0 +1,1 @@
+{"version":3,"file":"UIDesignTokens.d.ts","sourceRoot":"","sources":["../../mcp-server/src/ui/UIDesignTokens.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,OAAO,EAAE,MAAM,YAAY,CAAC;AAErC,eAAO,MAAM,iBAAiB,EAAE,MAAM,CAAC,MAAM,EAAE,OAAO,CAsKrD,CAAC;AAEF,wBAAgB,WAAW,CAAC,GAAG,EAAE,MAAM,GAAG;IAAE,CAAC,EAAE,MAAM,CAAC;IAAC,CAAC,EAAE,MAAM,CAAC;IAAC,CAAC,EAAE,MAAM,CAAA;CAAE,CAW5E"}

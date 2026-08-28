@@ -1,8 +1,10 @@
 import {
     ExecutionResult,
-    AvailabilityStatus
+    AvailabilityStatus,
+    ProviderState
 } from '../providers/types.js';
 import { IProvider } from '../providers/IProvider.js';
+import { providerRegistry } from '../providers/ProviderRegistry.js';
 import {
     restrictedCapabilityRegistry,
     RestrictedCapabilityDescriptor
@@ -74,20 +76,29 @@ export class CapabilityRouter {
     }
 
     /**
-     * Route a request to the best available provider.
+     * Route a request to the best available provider based on health and priority.
      */
     public async route(action: string, params: Record<string, any>): Promise<ExecutionResult> {
         // Resolve tool deduplication
         const resolvedAction = this.toolAliases[action] || action;
         
-        const candidateNames = this.routes.get(resolvedAction) || [resolvedAction, 'embedded-plugin'];
+        let candidateNames = this.routes.get(resolvedAction);
+        if (!candidateNames || candidateNames.length === 0) {
+            candidateNames = ['embedded-plugin', 'official-roblox-mcp', 'luau-provider', 'modeling-provider'];
+        }
 
         for (const providerName of candidateNames) {
-            const provider = this.providers.get(providerName);
+            let provider = this.providers.get(providerName);
+            if (!provider) {
+                provider = providerRegistry.get(providerName);
+            }
             if (!provider) continue;
 
             const health = await provider.healthCheck();
-            if (health.status !== AvailabilityStatus.AVAILABLE) {
+            const isHealthy = health.state === ProviderState.READY || health.status === AvailabilityStatus.AVAILABLE;
+            
+            // If provider is unhealthy, skip unless it's embedded-plugin as default
+            if (!isHealthy && providerName !== 'embedded-plugin') {
                 continue;
             }
 
@@ -116,3 +127,4 @@ export class CapabilityRouter {
 }
 
 export const capabilityRouter = new CapabilityRouter();
+

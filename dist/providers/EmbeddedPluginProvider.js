@@ -122,7 +122,10 @@ export class EmbeddedPluginProvider {
             const duration = Date.now() - startTime;
             return {
                 status: 'SUCCESS',
-                verified: true,
+                // A bridge response confirms transport execution only.  The caller's
+                // verification layer must independently inspect Studio before it can
+                // promote this operation to VERIFIED.
+                verified: false,
                 data: result,
                 changes: [],
                 evidence: [

@@ -86,7 +86,7 @@ export class LuauProvider {
                 const scriptSource = params.code || params.source || '';
                 // Forward execution request to embedded plugin or official mcp
                 const res = await commandDispatcher.executeCommand('script_set_source', {
-                    path: params.targetPath || 'ServerScriptService.TempExecutionScript',
+                    target: params.targetPath || 'ServerScriptService.TempExecutionScript',
                     source: scriptSource
                 });
                 return {
@@ -94,7 +94,9 @@ export class LuauProvider {
                     success: true,
                     data: res,
                     duration: Date.now() - startTime,
-                    verified: true
+                    // Script writes need an explicit source read-back or a
+                    // runtime/playtest postcondition before verification.
+                    verified: false
                 };
             }
             if (action === 'luau.analyze_syntax' || action === 'luau_analyze_syntax') {
@@ -114,14 +116,15 @@ export class LuauProvider {
             }
             if (action === 'luau.audit_security_boundaries' || action === 'luau_audit_security') {
                 return {
-                    status: 'SUCCESS',
-                    success: true,
+                    status: 'BLOCKED',
+                    success: false,
+                    code: 'BLOCKED_BY_PLATFORM',
+                    message: 'Security-boundary audit needs real script-source observations; no target scope was supplied.',
                     data: {
-                        secureRemotes: true,
-                        serverValidationFound: true,
-                        risks: []
+                        state: 'REQUIRES_SCRIPT_SOURCE_OBSERVATION'
                     },
-                    duration: Date.now() - startTime
+                    duration: Date.now() - startTime,
+                    verified: false
                 };
             }
             return {

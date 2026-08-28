@@ -3,6 +3,7 @@ import http from 'http';
 import https from 'https';
 import fs from 'fs';
 import path from 'path';
+import { randomBytes, timingSafeEqual } from 'crypto';
 import { fileURLToPath } from 'url';
 import { DEFAULT_CONFIG } from '../config.js';
 import { commandDispatcher } from '../dispatcher/commandDispatcher.js';
@@ -15,6 +16,7 @@ import { liveDashboard } from '../telemetry/LiveDashboard.js';
 import { multiModeEngine } from '../modes/MultiModeEngine.js';
 import { universalCapabilityEngine } from '../capabilities/UniversalCapabilityEngine.js';
 import { OperatingMode } from '../providers/types.js';
+import { studioSessionManager } from '../session/StudioSessionManager.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '../../..');
@@ -75,7 +77,7 @@ export class HttpBridgeServer {
                 tls: { enabled: true, fingerprint: certificateManager.getFingerprint() },
                 mcp: { active: true, stdioConnected: true },
                 uptimeSeconds: Math.floor((Date.now() - this.startTime) / 1000),
-                activeSessions: Array.from(this.sessions.values()),
+                activeSessions: this.getPublicSessions(),
             });
         });
         // 2. Readiness Probe
@@ -94,6 +96,7 @@ export class HttpBridgeServer {
         });
         // 4. Backward-compatible Status Endpoint
         this.app.get('/api/status', (_req, res) => {
+            this.purgeExpiredSessions();
             const activeSession = commandDispatcher.getActiveSession();
             res.json({
                 status: 'ok',
@@ -205,29 +208,39 @@ export class HttpBridgeServer {
                 connectedAt: Date.now(),
                 lastActive: Date.now(),
                 lastSeenAt: Date.now(),
+                bridgeToken: randomBytes(32).toString('base64url'),
             };
             this.sessions.set(payload.sessionId, sessionInfo);
             commandDispatcher.registerSession(payload);
             res.json({
                 success: true,
                 message: 'Handshake accepted. Multi-Studio MCP Bridge connected.',
-                session: sessionInfo,
+                session: this.toPublicSession(sessionInfo),
+                bridgeToken: sessionInfo.bridgeToken,
                 daemonVersion: '1.0.0',
                 fingerprint: certificateManager.getFingerprint(),
             });
         });
         // 7. Polling Command Queue
         this.app.post('/api/poll', async (req, res) => {
-            const { sessionId, events } = req.body;
+            const { sessionId, bridgeToken, events } = req.body;
             if (!sessionId) {
                 return res.status(400).json({ success: false, error: 'sessionId is required' });
             }
             const session = this.sessions.get(sessionId);
-            if (session) {
-                session.lastActive = Date.now();
-                session.lastSeenAt = Date.now();
+            if (!session || !this.tokenMatches(session.bridgeToken, bridgeToken)) {
+                return res.status(401).json({ success: false, error: 'Unknown session or invalid bridge token' });
             }
+            session.lastActive = Date.now();
+            session.lastSeenAt = Date.now();
             commandDispatcher.heartbeat(sessionId);
+            studioSessionManager.updateFromHeartbeat({
+                placeId: String(session.placeId || ''),
+                universeId: String(session.gameId || ''),
+                errors: Array.isArray(events)
+                    ? events.filter((event) => event.type === 'log' && (event.data.messageType === 'MessageError' || Boolean(event.data.traceback))).map((event) => String(event.data.message || 'Studio error'))
+                    : undefined,
+            });
             if (Array.isArray(events) && events.length > 0) {
                 commandDispatcher.ingestEvents(events);
             }
@@ -247,16 +260,27 @@ export class HttpBridgeServer {
         });
         // 8. Command Execution Response
         this.app.post('/api/response', (req, res) => {
-            const response = req.body;
-            if (!response || !response.id) {
-                return res.status(400).json({ success: false, error: 'Malformed response payload: id is required' });
+            const { bridgeToken, ...response } = req.body;
+            if (!response || !response.id || !response.sessionId) {
+                return res.status(400).json({ success: false, error: 'Malformed response payload: id and sessionId are required' });
+            }
+            const session = this.sessions.get(response.sessionId);
+            if (!session || !this.tokenMatches(session.bridgeToken, bridgeToken)) {
+                return res.status(401).json({ success: false, error: 'Unknown session or invalid bridge token' });
             }
             const handled = commandDispatcher.handleResponse(response);
             res.json({ success: handled });
         });
         // 9. Asynchronous Event Ingestion
         this.app.post('/api/events', (req, res) => {
-            const { events } = req.body;
+            const { sessionId, bridgeToken, events } = req.body;
+            const session = typeof sessionId === 'string' ? this.sessions.get(sessionId) : undefined;
+            if (!session || !this.tokenMatches(session.bridgeToken, bridgeToken)) {
+                return res.status(401).json({ success: false, error: 'Unknown session or invalid bridge token' });
+            }
+            session.lastActive = Date.now();
+            session.lastSeenAt = Date.now();
+            commandDispatcher.heartbeat(sessionId);
             if (Array.isArray(events)) {
                 commandDispatcher.ingestEvents(events);
             }
@@ -264,6 +288,16 @@ export class HttpBridgeServer {
         });
         // 10. Secondary MCP Process Remote Command Execution
         this.app.post('/api/execute', async (req, res) => {
+            this.purgeExpiredSessions();
+            if (this.sessions.size === 0) {
+                return res.status(503).json({
+                    success: false,
+                    error: {
+                        code: 'NO_STUDIO_CONNECTED',
+                        message: 'No live Roblox Studio plugin session is polling the bridge.',
+                    },
+                });
+            }
             const { action, params } = req.body;
             if (!action) {
                 return res.status(400).json({ success: false, error: 'action is required' });
@@ -283,6 +317,36 @@ export class HttpBridgeServer {
                 });
             }
         });
+    }
+    getPublicSessions() {
+        this.purgeExpiredSessions();
+        return Array.from(this.sessions.values()).map(session => this.toPublicSession(session));
+    }
+    /**
+     * A completed handshake is only an initial identity exchange.  It must not
+     * keep a dead Studio instance eligible for execution forever.  Poll/event
+     * traffic refreshes `lastSeenAt`; an expired plugin has to handshake again.
+     */
+    purgeExpiredSessions() {
+        const cutoff = Date.now() - DEFAULT_CONFIG.sessionExpiryMs;
+        for (const [sessionId, session] of this.sessions.entries()) {
+            if (session.lastSeenAt < cutoff) {
+                this.sessions.delete(sessionId);
+                if (commandDispatcher.getActiveSession()?.sessionId === sessionId) {
+                    commandDispatcher.clearSession();
+                }
+            }
+        }
+    }
+    toPublicSession({ bridgeToken: _bridgeToken, ...session }) {
+        return session;
+    }
+    tokenMatches(expected, received) {
+        if (typeof received !== 'string')
+            return false;
+        const expectedBuffer = Buffer.from(expected);
+        const receivedBuffer = Buffer.from(received);
+        return expectedBuffer.length === receivedBuffer.length && timingSafeEqual(expectedBuffer, receivedBuffer);
     }
     async start(port = DEFAULT_CONFIG.port, host = DEFAULT_CONFIG.host) {
         // Generate or load real X.509 TLS certificate (async)

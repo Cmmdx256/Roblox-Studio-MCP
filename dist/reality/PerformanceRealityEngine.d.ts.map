@@ -1,0 +1,1 @@
+{"version":3,"file":"PerformanceRealityEngine.d.ts","sourceRoot":"","sources":["../../mcp-server/src/reality/PerformanceRealityEngine.ts"],"names":[],"mappings":"AAAA;;;;;;;;GAQG;AAIH,OAAO,EAAE,wBAAwB,EAAsB,MAAM,YAAY,CAAC;AAE1E,qBAAa,wBAAwB;IACjC;;OAEG;IACU,kBAAkB,IAAI,OAAO,CAAC,wBAAwB,CAAC;CAsGvE;AAED,eAAO,MAAM,wBAAwB,0BAAiC,CAAC"}

@@ -219,7 +219,7 @@ export interface Change {
 }
 
 export interface ExecutionResult {
-    status?: 'SUCCESS' | 'ERROR' | 'FAILED_VERIFICATION' | 'PARTIAL';
+    status?: 'SUCCESS' | 'ERROR' | 'FAILED_VERIFICATION' | 'PARTIAL' | 'BLOCKED' | 'UNVERIFIED';
     success?: boolean;
     code?: FailureCode | string;
     message?: string;

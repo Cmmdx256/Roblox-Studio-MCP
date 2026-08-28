@@ -26,12 +26,16 @@ export interface RPCRequestPayload {
     action: string;
     params: Record<string, any>;
     timestamp: number;
+    /** Session selected by the bridge when the command was queued. */
+    sessionId?: string;
 }
 export interface RPCResponsePayload {
     id: string;
     success: boolean;
     result?: any;
     error?: RPCError;
+    /** Must match the session that received the queued command. */
+    sessionId?: string;
 }
 export interface StudioEvent {
     type: string;

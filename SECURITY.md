@@ -1,37 +1,49 @@
-# Security Architecture & Boundary Model
+# Roblox AI Platform — Security & Safety Policies
 
-## Guiding Principles
+## 1. Security Architecture & Risk Classification
 
-The Universal Roblox Studio AI MCP strictly adheres to the following non-negotiable security principles:
+All operations are evaluated by the `SecurityEngine` before execution:
 
-1. **No Undocumented Bypass**: The system never attempts to bypass Roblox engine security boundaries (`RobloxScriptSecurity`, internal CoreScript sandboxes).
-2. **Deterministic Evidence**: Operations never report success without verification. If a mutation cannot be verified, `FAILED_VERIFICATION` is returned.
-3. **Atomic Undo/Redo**: All mutations in Studio are wrapped in `ChangeHistoryService` recordings (`TryBeginRecording` / `FinishRecording`).
-4. **Local Host Isolation**: Bridge servers bind exclusively to `127.0.0.1` / `localhost` and enforce strict local origin validation.
-
----
-
-## Security Context Hierarchy
-
-| Context | Description | Permitted Operations |
+| Risk Level | Operations | Policy |
 |---|---|---|
-| **`SAFE`** | Local Node.js analytical queries | Discovery, graph queries, spec parsing, audits |
-| **`PluginSecurity`** | Roblox Studio Luau Plugin | DataModel edits, script source updates via `ScriptEditorService`, terrain voxel generation |
-| **`LocalUserSecurity`** | Studio IDE native process | Mesh generation, material generation, screen capture |
-| **`RobloxScriptSecurity`** | Internal Engine CoreScripts | **PROHIBITED / PROTECTED** |
+| `READ_ONLY` | `property_get`, `studio_search`, `script_search_code`, `selection_get` | Allowed unconditionally |
+| `LOW` | `selection_set`, `instance_rename`, `attribute_set` | Allowed with evidence logging |
+| `MEDIUM` | `property_set`, `instance_create`, `instance_move`, `terrain_fill_block` | Allowed with idempotency check |
+| `HIGH` | `script_set_source`, `instance_delete`, `terrain_clear`, `playtest_control` | Transaction waypoint required |
+| `CRITICAL` | Mutating `CoreGui`, `PluginGuiService`, internal Roblox binaries, or unauthenticated HTTP | **BLOCKED** |
 
 ---
 
-## Error Handling & Failure Types
+## 2. Protected Roblox Services
 
-The platform defines standard error codes across all layers:
-* `CAPABILITY_UNAVAILABLE`
-* `PROVIDER_UNAVAILABLE`
-* `PERMISSION_DENIED`
-* `FAILED_VERIFICATION`
-* `STALE_TARGET`
-* `INVALID_ARGUMENT`
-* `TIMEOUT`
-* `ROBLOX_ERROR`
-* `MCP_ERROR`
-* `UNKNOWN_CAPABILITY`
+The platform permanently blocks destructive mutations on protected internal Roblox services:
+- `CoreGui`
+- `PluginGuiService`
+- `RobloxPluginSecurity`
+- `PluginDebugService`
+- Operating system level files and paths
+
+---
+
+## 3. Asset Security & Creator Store Scanning (`AssetSecurityEngine.ts`)
+
+Third-party models and Creator Store assets are scanned before insertion:
+
+```
+ASSET SCRIPT SOURCE
+    │
+    ├── 1. Obfuscation Check: detects getfenv(), setfenv(), loadstring(), \104\116\116\112
+    ├── 2. Remote Require Check: detects require(123456789) external payloads
+    ├── 3. Unauthorized HTTP: detects HttpService requests to unknown endpoints
+    └── 4. Backdoor Check: detects TeleportService hijacks and hidden admin scripts
+    │
+    ▼
+SAFETY REPORT: SAFE | SUSPICIOUS | BLOCKED
+```
+
+---
+
+## 4. Multiplayer & Economy Security Rules
+
+- **Zero-Trust Client**: The client is never trusted for currency changes, inventory grants, or damage calculations.
+- **Strict Server Validation**: All `RemoteEvent` and `RemoteFunction` handlers must validate player ownership, distance, cooldowns, and parameter types on the server.
